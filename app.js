@@ -7,24 +7,23 @@ mongo.connect(url, (err, db) => { // connect node to db
 	if (err) console.log(err);
 
 	let collection = db.collection('restaurants'); // store the collection in a variable
-	
-	//let allChoice = prompt('Type "all" and press endter to display all restaurant names: '); // sets allChoice to user response to prompt
 
-	// if(allChoice == "all"){
-	// 	collection.find().toArray((err, docs) => { // display all docs in the collection
-	// 		console.log(docs);
-	// 	});
-	// } else {
-	// 	console.log("Aw, you dont want to see them?");
-	// }
+	function collectRestaurantInfo(name){
+		let newRestaurant = {};
+		newRestaurant.address = {};
+		if (name) {
+			newRestaurant.name = name;
+		} else {
+			newRestaurant.name = prompt('name: ');
+		}
+		newRestaurant.address.street = prompt('street: ');
+		newRestaurant.address.zipcode = prompt('zip code: ');
+		newRestaurant.yelp = prompt('yelp: ');
 
-
-	// Decision tree: READ(ALL or ONE), CREATE(add a new restaurant - prompts for every entry)
-	//     UPDATE(edit an entry), DELETE(delete an entry)
+		return newRestaurant;
+	}
 
 	//while (true) {
-
-
 		console.log('What would you like to do?\n  [a] See one or more restaurants\n  [b] Add a new restaurant\n  [c] Edit a restaurant\n  [d] Delete a restaurant');
 		let crudMethod = prompt('>>');
 		
@@ -50,14 +49,7 @@ mongo.connect(url, (err, db) => { // connect node to db
 			case 'b':  // The user can add a new restaurant
 				//  Prompt the user for info on a new restaurant and add it to the DB
 				console.log('-- Adding a new restaurant --');
-				let newRestaurant = {};
-				newRestaurant.address = {};
-				newRestaurant.name = prompt('name: ');
-				newRestaurant.address.street = prompt('street: ');
-				newRestaurant.address.zipcode = prompt('zip code: ');
-				newRestaurant.yelp = prompt('yelp: ');
-				//  Add the entry to the db
-				collection.insert(newRestaurant);
+				collection.insert(collectRestaurantInfo());
 				console.log('Thank you!');
 				break;
 
@@ -68,18 +60,7 @@ mongo.connect(url, (err, db) => { // connect node to db
 				let edit = prompt('>>');
 				console.log('Enter the new properties:');
 				// TODO: check if the restaurant actually exists
-				let editedRestaurant = {};
-				editedRestaurant.address = {};
-
-				editedRestaurant.name = edit;
-
-				editedRestaurant.address.street = prompt('street: ');
-
-				editedRestaurant.address.zipcode = prompt('zip code: ');
-
-				editedRestaurant.yelp  = prompt('yelp: ')
-
-				collection.updateOne({name: edit}, editedRestaurant);
+				collection.updateOne({name: edit}, collectRestaurantInfo(edit));
 				console.log('Thank you!');
 				break;
 
@@ -91,6 +72,7 @@ mongo.connect(url, (err, db) => { // connect node to db
 				collection.remove({name: deleteWhat});
 				console.log('Its gone');
 				break;
+
 			default:
 				console.log('That is not a valid response');
 		}
